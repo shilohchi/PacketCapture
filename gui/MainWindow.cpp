@@ -14,6 +14,7 @@ void MainWindow::startPacketProducerThread() {
 	}
 	producer = new PacketProducerThread(pool, this);
 	connect(&producer->getCounter(), SIGNAL(valueChanged(int)), lcdNumber, SLOT(display(int)));
+	connect(&producer->getCounter(), SIGNAL(valueChanged(int)), progressBar, SLOT(setMaximum(int)));
 	producer->setInterface("eth0");
 	producer->setFilter("tcp or udp");
 	producer->start();
@@ -24,6 +25,7 @@ void MainWindow::startPacketConsumerThread() {
 		consumer->stop();
 	}
 	consumer = new PacketConsumerThread(pool, this);
+	connect(consumer, SIGNAL(valueChanged(int)), progressBar, SLOT(setValue(int)));
 	consumer->setDbtype("mysql");
 	consumer->setHost("172.20.52.173");
 	consumer->setUser("qi");

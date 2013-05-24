@@ -6,7 +6,11 @@
 #include "PacketPool.h"
 
 class PacketConsumerThread : public QThread {
+Q_OBJECT
+
 private:
+	int count = 0;
+
 	bool stopping = false;
 	
 	std::string host{"localhost"};
@@ -39,6 +43,8 @@ public:
 
 	void setPassword(std::string password);
 
+signals:
+	void valueChanged(int);
 };
 
 #endif

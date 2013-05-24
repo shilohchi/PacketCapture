@@ -1,7 +1,6 @@
 #include <cxxpcap/cxxpcap.h>
 #include "PacketConsumerThread.h"
 #include "PacketDetailDAOFactory.h"
-#include <typeinfo>
 
 using namespace std;
 using namespace cxxpcap;
@@ -74,6 +73,9 @@ void PacketConsumerThread::run() {
 			}
 		}
 		dao->insert(detail);
+
+		count++;		
+		emit valueChanged(count);
 	}
 
 	dao->close();
