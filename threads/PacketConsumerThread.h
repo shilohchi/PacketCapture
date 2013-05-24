@@ -10,6 +10,10 @@ private:
 	bool stopping = false;
 	
 	std::string host{"localhost"};
+	
+	std::string dbname;
+
+	std::string dbtype;
 
 	std::string user;
 
@@ -25,7 +29,13 @@ public:
 
 	void stop();
 
+	void setDbtype(std::string dbtype);
+	
+	void setDbname(std::string dbname);
+
 	void setHost(std::string host);
+	
+	void setUser(std::string user);
 
 	void setPassword(std::string password);
 

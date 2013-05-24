@@ -10,7 +10,7 @@ using namespace std;
 
 void MysqlPacketDetailDAO::open(string host, string user, string password, string dbname) {
 
-	this->db = QSqlDatabase::addDatabase("QMYSQL");
+	db = QSqlDatabase::addDatabase("QMYSQL");
 	db.setHostName(host.c_str());
 	db.setUserName(user.c_str());
 	db.setPassword(password.c_str());

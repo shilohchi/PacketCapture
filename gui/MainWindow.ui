@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
+    <width>732</width>
     <height>551</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Packets Capture</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -100,6 +100,13 @@
       <widget class="QPushButton" name="btnStart">
        <property name="text">
         <string>Start</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnStop">
+       <property name="text">
+        <string>Stop</string>
        </property>
       </widget>
      </item>

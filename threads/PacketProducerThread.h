@@ -1,12 +1,14 @@
 #ifndef PACKET_PRODUCER_THREAD_H_
 #define PACKET_PRODUCER_THREAD_H_
 
-#include <QThread>
 #include <cxxpcap/cxxpcap.h>
 #include <string>
 #include "PacketPool.h"
+#include <QThread>
+#include "TrafficCounter.h"
+#include "PoolWriter.h"
 
-class PacketProducerThread : public QThread, public cxxpcap::PacketReciever {
+class PacketProducerThread : public QThread {
 Q_OBJECT
 
 private:
@@ -18,7 +20,9 @@ private:
 	
 	std::shared_ptr<PacketPool> pool;
 
-	int stats = 0;
+	TrafficCounter counter;
+	
+	PoolWriter writer;
 
 protected:
 	void run() override;
@@ -29,11 +33,11 @@ public:
 	void setInterface(std::string interface);
 
 	void setFilter(std::string filter);
+	
+	TrafficCounter& getCounter();
+	
+	void stop();
 
-	void recievePacket(std::shared_ptr<const cxxpcap::Packet> packet) override;
-
-signals:
-	void statsChanged(int);
 };
 
 #endif

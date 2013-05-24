@@ -1,5 +1,5 @@
-#ifndef PACKETCAPTURE_H_
-#define IPACKETCAPTURE_H_
+#ifndef PACKET_CAPTURE_H_
+#define PACKET_CAPTURE_H_
 #include <pcap.h>
 #include "cxxpcap/utils.h"
 #include <string>
@@ -31,7 +31,7 @@ private:
 
 	std::vector<std::function<void(std::shared_ptr<const Packet>)>> handlers;
 	
-	std::vector<std::shared_ptr<PacketReciever>> recievers;
+	std::vector<PacketReciever*> recievers;
 
 public:
 	static std::shared_ptr<std::vector<NetworkInterface> > findAllDevices();
@@ -48,7 +48,7 @@ public:
 	
 	void addHandler(std::function<void(std::shared_ptr<const Packet>)> handler);
 
-	void addHandler(std::shared_ptr<PacketReciever> reciever);
+	void addHandler(PacketReciever* reciever);
 
 	void fireEvent(std::shared_ptr<const Packet> packet);
 

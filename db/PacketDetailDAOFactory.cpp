@@ -7,8 +7,9 @@ using namespace std;
 
 shared_ptr<IPacketDetailDAO> PacketDetailDAOFactory::getPacketDetailDAO(string dbtype) {
 	if (dbtype == "mysql") {
-		return shared<IPacketDetailDAO>(new MysqlPacketDetailDAO());
+		return shared_ptr<IPacketDetailDAO>(new MysqlPacketDetailDAO());
 	} else {
-		throw UnsupportedDatabaseError("");
+		string msg = dbtype + " is not supported.";
+		throw UnsupportedDatabaseError(msg.c_str());
 	}
 }

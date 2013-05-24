@@ -1,21 +1,51 @@
 #include "MainWindow.h"
 #include <iostream>
-#include "CaptureThread.h"
 
 using namespace std;
 
 MainWindow::MainWindow() {
 	this->setupUi(this);
-	connect(btnStart, SIGNAL(clicked()), this, SLOT(showinfo()));	
+
 }
 
-void MainWindow::showinfo() {
-	if (capture) {
-		capture = new CaptureThread();
-		capture->start();
+void MainWindow::startPacketProducerThread() {
+	if (producer) {
+		producer->stop();
+	}
+	producer = new PacketProducerThread(pool, this);
+	connect(&producer->getCounter(), SIGNAL(valueChanged(int)), lcdNumber, SLOT(display(int)));
+	producer->setInterface("eth0");
+	producer->setFilter("tcp or udp");
+	producer->start();
+}
+
+void MainWindow::startPacketConsumerThread() {
+	if (consumer) {
+		consumer->stop();
+	}
+	consumer = new PacketConsumerThread(pool, this);
+	consumer->setDbtype("mysql");
+	consumer->setHost("172.20.52.173");
+	consumer->setUser("qi");
+	consumer->setPassword("qi");
+	consumer->setDbname("live_capture");
+	consumer->start();
+}
+
+void MainWindow::on_btnStart_clicked() {
+	pool = shared_ptr<PacketPool>(new PacketPool(SIZE));
+	startPacketProducerThread();
+	startPacketConsumerThread();
+}
+
+void MainWindow::on_btnStop_clicked() {
+	if (producer) {
+		producer->stop();
+	}
+	if (consumer) {
+		consumer->stop();
 	}
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-	delete capture;
 }

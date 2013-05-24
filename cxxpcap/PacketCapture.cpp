@@ -71,7 +71,7 @@ void PacketCapture::addHandler(function<void(shared_ptr<const Packet>)> handler)
 	handlers.push_back(handler);
 }
 
-void PacketCapture::addHandler(shared_ptr<PacketReciever> reciever) {
+void PacketCapture::addHandler(PacketReciever* reciever) {
 	recievers.push_back(reciever);
 }
 

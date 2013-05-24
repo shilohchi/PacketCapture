@@ -1,6 +1,7 @@
 #include "PacketPool.h"
 #include <QMutexLocker>
 #include <stdexcept>
+#include <QThread>
 
 using namespace std;
 using namespace cxxpcap;
@@ -25,6 +26,7 @@ void PacketPool::put(shared_ptr<const Packet> packet) {
 	QMutexLocker(&this->mutex);
 	buffer[head] = packet;
 	head = (head + 1) % size;
+	DLOG(INFO) << "thread " << QThread::currentThreadId() << " puts";
 	fullSlotSem->release();
 }
 
@@ -33,6 +35,7 @@ shared_ptr<const Packet> PacketPool::take() {
 	QMutexLocker(&this->mutex);
 	shared_ptr<const Packet> packet = buffer[tail];
 	tail = (tail + 1) % size;
+	DLOG(INFO) << "thread " << QThread::currentThreadId() << " takes";
 	emptySlotSem->release();
 	return packet;
 }
