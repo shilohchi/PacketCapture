@@ -4,14 +4,13 @@
 #include <boost/any.hpp>
 #include <map>
 #include <string>
-#include <memory>
 
 class ConfigParser {
 private:
-	static std::shared_ptr<map<std::string, boost::any>> config;
+	static std::map<std::string, boost::any> config;
 
 public:
-	static std::shared_ptr<const map<std::string, boost::any>> getConfig();
+	static const std::map<std::string, boost::any>& getConfig(std::string filename);
 };
 
 #endif

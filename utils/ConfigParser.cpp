@@ -8,17 +8,15 @@
 using namespace std;
 using namespace TinyXPath;
 
-shared_ptr<map<string
-multimap<string, string>* ConfigSingleton::getConfig() {
-	if (ConfigSingleton::config == NULL) {
-
+const map<string, boost::any>& ConfigParser::getConfig(string filename) {
+	if (!config) {
 	
-		ConfigSingleton::config = new multimap<string, string>();
-		const char* filename = "config.xml";
-		TiXmlDocument doc(filename);
+		config = shared_ptr<map<string, boost::any>>(new map<string, boost::any>());
+
+		TiXmlDocument doc(filename.c_str());
 		if (!doc.LoadFile()) {
-			
-			throw ConfigError("Cannot open config.xml!");
+			string msg = "Cannot open " + filename;	
+			throw ConfigError(msg.c_str());
 		}
 		
 		TiXmlElement* root = doc.RootElement();
@@ -30,7 +28,7 @@ multimap<string, string>* ConfigSingleton::getConfig() {
 			throw ConfigError("There must be one and only one network interface name!");
 		}
 		TiXmlElement* e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
-		config->insert(make_pair("network-interface", e->GetText()));
+		config["interface"] = string(e->getText());
 		delete xproc;
 
 	
@@ -40,7 +38,7 @@ multimap<string, string>* ConfigSingleton::getConfig() {
 			throw ConfigError("Requires (only) one host for databse.");
 		}
 		e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
-		config->insert(make_pair("database-host", e->GetText()));
+		config["database.host"] = string(e->getText());
 		delete xproc;
 		
 		xproc = new xpath_processor(root, "/app/database/user");
@@ -49,7 +47,7 @@ multimap<string, string>* ConfigSingleton::getConfig() {
 			throw ConfigError("Requires (only) one user for database.");
 		}
 		e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
-		config->insert(make_pair("database-user", e->GetText()));
+		config["database.user"] = string(e->getText());
 		delete xproc;
 
 		xproc = new xpath_processor(root, "/app/database/password");
@@ -58,33 +56,27 @@ multimap<string, string>* ConfigSingleton::getConfig() {
 			throw ConfigError("Requires (only) one password for database.");
 		}
 		e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
-		config->insert(make_pair("database-password", e->GetText()));
+		config["database.password"] = string(e->getText());
 		delete xproc;
 
-		xproc = new xpath_processor(root, "/app/database/name");
+		xproc = new xpath_processor(root, "/app/database/dbtype");
+		num = xproc->u_compute_xpath_node_set();
+		if (num != 1) {
+			throw ConfigError("Requires (only) one database type.");
+		}
+		e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
+		config["database.dbtype"] = string(e->getText());
+		delete xproc;
+
+		xproc = new xpath_processor(root, "/app/database/dbname");
 		num = xproc->u_compute_xpath_node_set();
 		if (num != 1) {
 			throw ConfigError("Requires (only) one database name.");
 		}
 		e = (TiXmlElement*) (xproc->XNp_get_xpath_node(0));
-		config->insert(make_pair("database-name", e->GetText()));
+		config["database.dbname"] = string(e->getText());
 		delete xproc;
 		
-		xproc = new xpath_processor(root, "/app/low-level-filters/rule");
-		num = xproc->u_compute_xpath_node_set();
-		for (int i = 0; i < num; i++) {
-			e = (TiXmlElement*) (xproc->XNp_get_xpath_node(i));
-			config->insert(make_pair("low-level-filter", e->GetText()));
-		}
-		delete xproc;
-
-		xproc = new xpath_processor(root, "/app/application-layer-filters/rule");
-		num = xproc->u_compute_xpath_node_set();
-		for (int i = 0; i < num; i++) {
-			e = (TiXmlElement*) (xproc->XNp_get_xpath_node(i));
-			config->insert(make_pair("application-layer-filter", e->GetText()));
-		}
-		delete xproc;
 	}
 	return ConfigSingleton::config;
 }
