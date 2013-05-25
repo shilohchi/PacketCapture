@@ -1,6 +1,6 @@
-#include <cxxpcap/cxxpcap.h>
 #include "PacketConsumerThread.h"
 #include "PacketDetailDAOFactory.h"
+#include <cxxpcap/cxxpcap.h>
 
 using namespace std;
 using namespace cxxpcap;
@@ -59,17 +59,14 @@ void PacketConsumerThread::run() {
 			}
 
 			if (shared_ptr<const TCPPacket> tcppkt = dynamic_pointer_cast<const TCPPacket>(packet)) {
-				DLOG(INFO) << "tcp";
 				detail.transport_protocol = "tcp";
 				detail.src_port = tcppkt->getSourcePort();
 				detail.dst_port = tcppkt->getDestinationPort();
 			} else if (shared_ptr<const UDPPacket> udppkt = dynamic_pointer_cast<const UDPPacket>(packet)) {
-				DLOG(INFO) << "udp";
 				detail.transport_protocol = "udp";
 				detail.src_port = udppkt->getSourcePort();
 				detail.dst_port = udppkt->getDestinationPort();
 			} else {
-				DLOG(INFO) << "ip";
 			}
 		}
 		dao->insert(detail);

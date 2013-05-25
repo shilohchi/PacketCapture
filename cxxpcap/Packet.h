@@ -2,8 +2,7 @@
 #define PACKET_H_
 
 #include <cstdint>
-#include <ctime>
-
+#include <pcap.h>
 namespace cxxpcap {
 class Packet {
 private:

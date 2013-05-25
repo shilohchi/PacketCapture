@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <app>
 
-	<network-interface>eth0</network-interface>
+	<network-interface>\Device\NPF_{1E5E7789-B615-470C-89C3-CCBF9287ADF4}</network-interface>
 
 	<database>
 		<host>172.20.52.48</host>

@@ -44,7 +44,6 @@ void MysqlPacketDetailDAO::insert(const PacketDetail& packet) {
 	query.bindValue(":dst_port", packet.dst_port);
 	query.bindValue(":transport_protocol", packet.transport_protocol);
 	query.bindValue(":application_protocol", packet.application_protocol);
-	DLOG(INFO) << "--------------------" << packet.transport_protocol.toStdString();
 	if (!query.exec()) {
 		throw SqlError("failed to insert!");
 	}

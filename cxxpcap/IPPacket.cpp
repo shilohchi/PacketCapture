@@ -1,7 +1,7 @@
-#include <glog/logging.h>
 #include "cxxpcap/IPPacket.h"
 #include <string>
 #include <cstdint>
+#include <patch.h>
 
 using namespace std;
 
@@ -83,7 +83,7 @@ string IPPacket::getSourceIP() const {
 	uint32_t ip_int = *((uint32_t*) (ip_header + 12));
 	for (int i = 0; i < 4; i++) {
 		int t = (ip_int >> i * 8) & 0xff;
-		ip_str += to_string(t);
+		ip_str += patch::to_string(t);
 		if (i + 1 != 4) {
 			ip_str += ".";
 		}
@@ -96,7 +96,7 @@ string IPPacket::getDestinationIP() const {
 	uint32_t ip_int = *((uint32_t*) (ip_header + 16));
 	for (int i = 0; i < 4; i++) {
 		int t = (ip_int >> i * 8) & 0xff;
-		ip_str += to_string(t);
+		ip_str += patch::to_string(t);
 		if (i + 1 != 4) {
 			ip_str += ".";
 		}

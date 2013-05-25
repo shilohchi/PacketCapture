@@ -13,12 +13,12 @@ void PacketProducerThread::setFilter(string filter) {
 	this->filter = filter;
 }
 
-void PacketProducerThread::setInterface(string interface) {
-	this->interface = interface;
+void PacketProducerThread::setInterface(string netinterface) {
+	this->netinterface = netinterface;
 }
 
 void PacketProducerThread::run() {
-	capture.open(interface);
+	capture.open(netinterface);
 	capture.setFilter(filter);
 	capture.addHandler(&this->counter);
 	capture.addHandler(&this->writer);

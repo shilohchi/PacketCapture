@@ -1,5 +1,4 @@
 #include "cxxpcap/UDPPacket.h"
-#include <glog/logging.h>
 
 namespace cxxpcap {
 bool UDPPacket::isValid(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {

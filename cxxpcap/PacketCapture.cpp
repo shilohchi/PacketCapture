@@ -4,7 +4,6 @@
 #include <string>
 #include "cxxpcap/utils.h"
 #include "cxxpcap/PacketFactory.h"
-#include <glog/logging.h>
 
 using namespace std;
 
@@ -26,12 +25,12 @@ shared_ptr<vector<NetworkInterface> > PacketCapture::findAllDevices() {
 		throw PcapError(errbuf);
 	}
 	for(pcap_if_t* d = alldevs; d != NULL; d = d->next) {
-		NetworkInterface interface = {
+		NetworkInterface netinterface = {
 			d->name ? d->name : "",
 			d->description ? d->description : ""
 		};
-		string s = interface.name;
-		pv->push_back(interface);
+		string s = netinterface.name;
+		pv->push_back(netinterface);
 	}
 	pcap_freealldevs(alldevs);
 	return pv;

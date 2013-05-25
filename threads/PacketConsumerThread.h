@@ -1,10 +1,9 @@
 #ifndef PACKET_CONSUMER_THREAD_H_
 #define PACKET_CONSUMER_THREAD_H_
 
-#include <memory>
 #include <QThread>
 #include "PacketPool.h"
-
+#include <memory>
 class PacketConsumerThread : public QThread {
 Q_OBJECT
 
