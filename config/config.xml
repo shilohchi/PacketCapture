@@ -7,12 +7,11 @@
 		<host>172.20.52.48</host>
 		<user>root</user>
 		<password>root</password>
-		<name>live_capture</name>
+		<dbname>live_capture</dbname>
+		<dbtype>mysql</dbtype>
 	</database>
 
-	<low-level-filters>
-		<rule>(ip and tcp) or (ip and udp)</rule>
-	</low-level-filters>
+	<low-level-filter>tcp or udp</low-level-filter>
 
 	<application-layer-filters>
 		<rule>e-mail</rule>

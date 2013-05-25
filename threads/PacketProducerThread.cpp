@@ -31,5 +31,4 @@ TrafficCounter& PacketProducerThread::getCounter() {
 
 void PacketProducerThread::stop() {
 	capture.stop();
-	capture.close();
 }

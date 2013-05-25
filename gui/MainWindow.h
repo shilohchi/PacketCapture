@@ -6,6 +6,7 @@
 #include "PacketConsumerThread.h"
 #include "PacketPool.h"
 #include <memory>
+#include "ConfigParser.h"
 
 class MainWindow : public QWidget, private Ui_MainWindow {
 Q_OBJECT
@@ -18,6 +19,8 @@ private:
 	PacketProducerThread* producer = NULL;
 
 	PacketConsumerThread* consumer = NULL;
+	
+	ConfigParser parser{"config/config.xml"};
 
 public:
 	MainWindow();

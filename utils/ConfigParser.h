@@ -7,10 +7,12 @@
 
 class ConfigParser {
 private:
-	static std::map<std::string, boost::any> config;
+	std::map<std::string, std::string> config;	
 
 public:
-	static const std::map<std::string, boost::any>& getConfig(std::string filename);
+	ConfigParser(std::string filename);
+	
+	std::string get(std::string item);
 };
 
 #endif

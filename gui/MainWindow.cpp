@@ -5,7 +5,6 @@ using namespace std;
 
 MainWindow::MainWindow() {
 	this->setupUi(this);
-
 }
 
 void MainWindow::startPacketProducerThread() {
@@ -15,8 +14,8 @@ void MainWindow::startPacketProducerThread() {
 	producer = new PacketProducerThread(pool, this);
 	connect(&producer->getCounter(), SIGNAL(valueChanged(int)), lcdNumber, SLOT(display(int)));
 	connect(&producer->getCounter(), SIGNAL(valueChanged(int)), progressBar, SLOT(setMaximum(int)));
-	producer->setInterface("eth0");
-	producer->setFilter("tcp or udp");
+	producer->setInterface(parser.get("interface"));
+	producer->setFilter(parser.get("low_level_filter"));
 	producer->start();
 }
 
@@ -26,11 +25,11 @@ void MainWindow::startPacketConsumerThread() {
 	}
 	consumer = new PacketConsumerThread(pool, this);
 	connect(consumer, SIGNAL(valueChanged(int)), progressBar, SLOT(setValue(int)));
-	consumer->setDbtype("mysql");
-	consumer->setHost("172.20.52.173");
-	consumer->setUser("qi");
-	consumer->setPassword("qi");
-	consumer->setDbname("live_capture");
+	consumer->setDbtype(parser.get("database.dbtype"));
+	consumer->setHost(parser.get("database.host"));
+	consumer->setUser(parser.get("database.user"));
+	consumer->setPassword(parser.get("database.password"));
+	consumer->setDbname(parser.get("database.dbname"));
 	consumer->start();
 }
 
@@ -45,9 +44,10 @@ void MainWindow::on_btnStop_clicked() {
 		producer->stop();
 	}
 	if (consumer) {
-		consumer->stop();
+//		consumer->stop();
 	}
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+	
 }
