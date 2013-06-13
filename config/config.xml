@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <app>
 
-	<network-interface>\Device\NPF_{1E5E7789-B615-470C-89C3-CCBF9287ADF4}</network-interface>
+	<network-interface>eth0</network-interface>
 
 	<database>
-		<host>172.20.52.48</host>
+		<host>172.20.52.173</host>
 		<user>root</user>
 		<password>root</password>
 		<dbname>live_capture</dbname>

@@ -8,7 +8,7 @@ using namespace cxxpcap;
 
 PacketPool::~PacketPool() {
 	if (buffer) {
-		delete buffer;
+		delete[] buffer;
 	}
 }
 

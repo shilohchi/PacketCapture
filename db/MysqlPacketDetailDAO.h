@@ -10,7 +10,7 @@ private:
 	QSqlDatabase db;
 
 public:
-	void open(std::string host, std::string user, std::string password, std::string dbname) override;
+	void open() override;
 
 	void close() override;
 

@@ -17,5 +17,7 @@ create table packets_details (
 	dst_port int,
 	transport_protocol varchar(20),
 	
-	application_protocol varchar(20)
+	application_protocol varchar(20),
+	
+	task_name varchar(50)
 );

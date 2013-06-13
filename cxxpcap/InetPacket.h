@@ -1,8 +1,8 @@
 #ifndef INETPACKET_H_
 #define INETPACKET_H_
 
-#include "cxxpcap/Packet.h"
 #include "cxxpcap/utils.h"
+#include "cxxpcap/Packet.h"
 #include "cxxpcap/DatalinkInfo.h"
 #include <memory>
 

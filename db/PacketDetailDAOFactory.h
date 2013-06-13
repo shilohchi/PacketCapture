@@ -7,7 +7,7 @@
 
 class PacketDetailDAOFactory {
 public:
-	static std::shared_ptr<IPacketDetailDAO> getPacketDetailDAO(string dbtype);
+	static std::shared_ptr<IPacketDetailDAO> getPacketDetailDAO();
 };
 
 #endif

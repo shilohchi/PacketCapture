@@ -17,6 +17,7 @@ struct PacketDetail {
 	int dst_port;
 	QString transport_protocol;
 	QString application_protocol;
+	QString task_name;
 };
 
 #endif

@@ -2,7 +2,7 @@
 #define CXXPCAP_UTILS_H_
 #include <string>
 #include <stdexcept>
-
+using namespace std;
 namespace cxxpcap {
 enum class Protocol {
 	Unknown,

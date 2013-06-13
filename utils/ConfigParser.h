@@ -3,15 +3,19 @@
 
 #include <map>
 #include <string>
+#include <boost/any.hpp>
+#include <memory>
 
 class ConfigParser {
 private:
-	std::map<std::string, std::string> config;	
+	std::map<std::string, boost::any> config;	
+	
+	static std::shared_ptr<ConfigParser> parser;
 
 public:
-	ConfigParser(std::string filename);
+	static std::shared_ptr<ConfigParser> getConfigParser();
 	
-	std::string get(std::string item);
+	boost::any get(std::string item);
 };
 
 #endif
