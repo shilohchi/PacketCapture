@@ -6,7 +6,7 @@ QVariantMap GetConfigHandler::handleRequest(QVariantMap request) {
 		return next->handleRequest(request);
 	}
 
-	QSettings settings("config/config.ini");
+	QSettings settings("config/config.ini", QSettings::IniFormat);
 
 	QVariantList list;
 	if (request["items"].canConvert<QVariantList>()) {
@@ -22,6 +22,7 @@ QVariantMap GetConfigHandler::handleRequest(QVariantMap request) {
 		if (!settings.contains(key)) {
 			QVariantMap error;
 			error["status"] = "error";
+			error["msg"] = key + " not found.";
 			return error;
 		}
 		result[key] = settings.value(key);

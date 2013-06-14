@@ -17,13 +17,10 @@ void Server::listen() {
 void Server::on_newConnection() {
 	socket = server->nextPendingConnection();
 	cout << "connected .." << endl;
-	DLOG(INFO) << "kdjf FUCK";
 	connect(socket, SIGNAL(readyRead()), this, SLOT(on_readyRead()));
-	DLOG(INFO) << "FUCK";
 }
 
 void Server::on_readyRead() {
-/*
 	QJson::Parser parser;
 	QJson::Serializer serializer;
 	bool ok = false;
@@ -33,7 +30,7 @@ void Server::on_readyRead() {
 			socket->disconnectFromHost();
 			return;
 		}
-		cout << ba.data() << endl;
+		cout << ba.data();
 
 		QVariantMap request = parser.parse(ba, &ok).toMap();
 		if (ok) {
@@ -42,10 +39,9 @@ void Server::on_readyRead() {
 			socket->write(data);
 			socket->write("\r\n");
 		} else {
-			cout << "error json format!!!";
+			cout << "error in json format!!!" << endl;;
 		}
 	}
-	*/
 }
 
 void Server::on_disconnected() {
