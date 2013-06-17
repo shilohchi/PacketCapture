@@ -2,8 +2,8 @@
 #define POOL_WRITER_H_
 
 #include "PacketPool.h"
-#include <cxxpcap/PacketCapture.h>
 #include <memory>
+#include <cxxpcap/PacketCapture.h>
 
 class PoolWriter : public cxxpcap::PacketReciever {
 private:
@@ -16,6 +16,6 @@ public:
 
 	PoolWriter(std::shared_ptr<PacketPool> pool); 
 
-	void recievePacket(std::shared_ptr<const cxxpcap::Packet> packet) override; 
+	void recievePacket(std::shared_ptr<cxxpcap::Packet> packet) override; 
 };
 #endif

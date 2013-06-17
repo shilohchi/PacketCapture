@@ -1,8 +1,8 @@
 #ifndef PACKET_H_
 #define PACKET_H_
 
-#include <cstdint>
 #include <pcap.h>
+
 namespace cxxpcap {
 class Packet {
 private:
@@ -10,28 +10,27 @@ private:
 	timeval timestamp;
 	
 protected:
-	std::uint8_t* start;
-	std::uint8_t* end;
+	unsigned char* start = NULL;
+	unsigned char* end = NULL;
 
 public:
-	typedef const std::uint8_t* const_iterator;
+	typedef const unsigned char* const_iterator;
 	
-	Packet(const std::uint8_t* raw_data, int raw_data_length);
-	Packet(int length, timeval timestamp, const std::uint8_t* raw_data, int raw_data_length);
+	Packet(int length, timeval timestamp, const unsigned char* raw_data, int raw_data_length);
 
 	Packet(const Packet&) = delete;
 
 	Packet& operator=(const Packet&) = delete;
 
-	~Packet();
+	virtual ~Packet();
 
-	virtual int getLength() const;
-	virtual timeval getTimestamp() const;
+	int getLength() const;
+	timeval getTimestamp() const;
 
 	Packet::const_iterator raw_data_begin() const;
 	Packet::const_iterator raw_data_end() const;
 
-	virtual int raw_data_length() const;
+	int raw_data_length() const;
 };
 }
 #endif

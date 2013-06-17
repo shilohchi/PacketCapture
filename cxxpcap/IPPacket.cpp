@@ -1,36 +1,28 @@
 #include "cxxpcap/IPPacket.h"
 #include <string>
-#include <cstdint>
+#include "assert_ex.h"
 
 using namespace std;
 
 namespace cxxpcap {
-bool IPPacket::isValid(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {
-	if (!InetPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-		return false;
+bool IPPacket::isValid(shared_ptr<InetPacket> packet) {
+	bool valid = true;
+	try {
+		assert_ex(packet->getDatalinkProtocol() == Protocol::IP, ValidationError(""));
+		assert_ex(packet->datalink_data_end() >= packet->datalink_data_begin() + 20, ValidationError(""));
+		int len = int(*packet->datalink_data_begin() & 0xf) * 4;
+		assert_ex(packet->datalink_data_end() >= packet->datalink_data_begin() + len, ValidationError(""));
+	} catch (ValidationError& e) {
+		valid = false;
 	}
-	InetPacket inetpkt(raw_data, raw_data_length, datalink_protocol);
-	if (inetpkt.getDatalinkProtocol() != Protocol::IP) {
-		return false;
-	}
-	if (inetpkt.datalink_data_end() < inetpkt.datalink_data_begin() + 20) {
-		return false;
-	}
-	int len = int(*inetpkt.datalink_data_begin() & 0xf) * 4;
-	if (inetpkt.datalink_data_end() < inetpkt.datalink_data_begin() + len) {
-		return false;
-	}
-	return true;
+	return valid;
 }
 
-
-IPPacket::IPPacket(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) :
-		IPPacket(raw_data_length, {0, 0}, raw_data, raw_data_length, datalink_protocol) {
-}
-
-IPPacket::IPPacket(int length, timeval timestamp, const uint8_t* raw_data,
-		int raw_data_length, Protocol datalink_protocol) :
-		InetPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol) {
+IPPacket::IPPacket(shared_ptr<InetPacket> packet) :
+		InetPacket(packet, packet->getDatalinkType()) {
+	if (!isValid(packet)) {
+		throw PcapError("ip");
+	}
 	this->ip_header = this->datalink_data;
 	this->ip_data = this->datalink_data + getIPHeaderLength();
 }	

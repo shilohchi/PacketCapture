@@ -1,24 +1,25 @@
 #include "cxxpcap/TCPPacket.h"
+#include "assert_ex.h"
+
+using namespace std;
 
 namespace cxxpcap {
-bool TCPPacket::isValid(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {
-	if (!IPPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-		return false;
+bool TCPPacket::isValid(shared_ptr<IPPacket> packet) {
+	bool valid = true;
+	try {
+		assert_ex(packet->getIPProtocol() == Protocol::TCP, ValidationError(""));
+		assert_ex(packet->raw_data_end() >= packet->ip_data_begin() + 20, ValidationError(""));
+	} catch (ValidationError& e) {
+		valid = false;
 	}
-	IPPacket pkt(raw_data, raw_data_length, datalink_protocol);
-	if (pkt.getIPProtocol() != Protocol::TCP || pkt.raw_data_end() < pkt.ip_data_begin() + 20) {
-		return false;
-	}
-	return true;
+	return valid;
 }
 
-TCPPacket::TCPPacket(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) :
-		TCPPacket(raw_data_length, {0, 0}, raw_data, raw_data_length, datalink_protocol) {
-}
-
-TCPPacket::TCPPacket(int length, timeval timestamp, const uint8_t* raw_data,
-		int raw_data_length, Protocol datalink_protocol) :
-		IPPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol) {
+TCPPacket::TCPPacket(shared_ptr<IPPacket> packet) :
+		IPPacket(packet) {
+	if (!isValid(packet)) {
+		throw PcapError("tcp");
+	}
 	this->tcp_header = this->ip_data;
 	this->tcp_data = this->ip_data + getTCPHeaderLength();
 }

@@ -1,27 +1,28 @@
 #include "cxxpcap/InetPacket.h"
-#include "cxxpcap/utils.h"
-#include <cstdint>
+#include "cxxpcap/cxxpcap_utils.h"
+#include "assert_ex.h"
 
 using namespace std;
 
 namespace cxxpcap {
-bool InetPacket::isValid(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {
-	Packet pkt(raw_data, raw_data_length);
-	if (datalink_protocol == Protocol::Ethernet &&
-			pkt.raw_data_end() >= pkt.raw_data_begin() + 14) {
-		return true;
+bool InetPacket::isValid(shared_ptr<Packet> packet, Protocol datalink_protocol) {
+	bool valid = true;
+	try {
+		assert_ex(datalink_protocol == Protocol::Ethernet, ValidationError("")); 
+		assert_ex(packet->raw_data_end() >= packet->raw_data_begin() + 14, ValidationError(""));
+	} catch (ValidationError& e) {
+		valid = false;
 	}
-	return false;
+	return valid;
 }
 
-InetPacket::InetPacket(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) :
-		InetPacket(raw_data_length, {0, 0}, raw_data, raw_data_length, datalink_protocol) {
-}
-
-InetPacket::InetPacket(int length, timeval timestamp, const uint8_t* raw_data, 
-		int raw_data_length, Protocol datalink_protocol) :
-		Packet(length, timestamp, raw_data, raw_data_length) {
-	this->datalinkInfo = shared_ptr<DatalinkInfo>(new EthernetInfo(raw_data));
+InetPacket::InetPacket(shared_ptr<Packet> packet, Protocol datalink_protocol) :
+		Packet(packet->getLength(), packet->getTimestamp(), packet->raw_data_begin(),
+				packet->raw_data_length()) {
+	if (!isValid(packet, datalink_protocol)) {
+		throw PacketError("inet");
+	}
+	this->datalinkInfo = shared_ptr<DatalinkInfo>(new EthernetInfo(this->raw_data_begin()));
 	this->datalink_header = this->start;
 	this->datalink_data = this->start + this->datalinkInfo->getLength();
 }
@@ -32,6 +33,10 @@ shared_ptr<DatalinkInfo> InetPacket::getDatalinkInfo() const {
 
 Protocol InetPacket::getDatalinkProtocol() const {
 	return datalinkInfo->getProtocol();
+}
+
+Protocol InetPacket::getDatalinkType() {
+	return datalinkInfo->getType();
 }
 
 InetPacket::const_iterator InetPacket::datalink_header_begin() const {

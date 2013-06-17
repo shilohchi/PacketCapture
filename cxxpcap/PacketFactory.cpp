@@ -4,49 +4,31 @@
 #include "cxxpcap/IPPacket.h"
 #include "cxxpcap/UDPPacket.h"
 #include "cxxpcap/TCPPacket.h"
-#include "cxxpcap/utils.h"
-#include <cstdint>
+#include "cxxpcap/cxxpcap_utils.h"
 #include <ctime>
 #include <memory>
 
 using namespace std;
 
 namespace cxxpcap {
-shared_ptr<const Packet> PacketFactory::createPacket(int length, timeval timestamp, 
-		const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {
-	Protocol protocol = Protocol::Unknown;
-
-	if (InetPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-		protocol = Protocol::INET;
-		if (IPPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-			protocol = Protocol::IP;
-			if (UDPPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-				protocol = Protocol::UDP;
-			} else if (TCPPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-				protocol = Protocol::TCP;
+shared_ptr<Packet> PacketFactory::createPacket(int length, timeval timestamp, 
+		const unsigned char* raw_data, int raw_data_length, Protocol datalink_protocol) {
+	shared_ptr<Packet> packet(new Packet(length, timestamp, raw_data, raw_data_length));	
+	if (InetPacket::isValid(packet, datalink_protocol)) {
+		shared_ptr<InetPacket> inetpkt = shared_ptr<InetPacket>(new InetPacket(packet, datalink_protocol));
+		packet = inetpkt;
+		if (IPPacket::isValid(inetpkt)) {
+			shared_ptr<IPPacket> ippkt = shared_ptr<IPPacket>(new IPPacket(inetpkt));
+			packet = ippkt;
+			if (UDPPacket::isValid(ippkt)) {
+				shared_ptr<UDPPacket> udppkt = shared_ptr<UDPPacket>(new UDPPacket(ippkt));
+				packet = udppkt;
+			} else if (TCPPacket::isValid(ippkt)) {
+				shared_ptr<TCPPacket> tcppkt = shared_ptr<TCPPacket>(new TCPPacket(ippkt));
+				packet = tcppkt;
 			}
 		}
 	}
-	
-	shared_ptr<const Packet> packet;
-	switch (protocol) {
-	case Protocol::Unknown:
-		packet = shared_ptr<const Packet>(new Packet(length, timestamp, raw_data, raw_data_length));
-		break;
-	case Protocol::INET:
-		packet = shared_ptr<const Packet>(new InetPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol));
-		break;
-	case Protocol::IP:
-		packet = shared_ptr<const Packet>(new IPPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol));	
-		break;
-	case Protocol::UDP:
-		packet = shared_ptr<const Packet>(new UDPPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol));	
-		break;
-	case Protocol::TCP:
-		packet = shared_ptr<const Packet>(new TCPPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol));	
-		break;
-	}
-
 	return packet;
 }
 }

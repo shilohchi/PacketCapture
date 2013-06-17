@@ -1,6 +1,10 @@
 #include "PacketConsumerThread.h"
-#include "PacketDetailDAOFactory.h"
-#include <cxxpcap/cxxpcap.h>
+#include "PacketDAOFactory.h"
+#include "Filter.h"
+#include "TaskFilter.h"
+#include "NullFilter.h"
+#include "TrivialFilter.h"
+#include <QSettings>
 
 using namespace std;
 using namespace cxxpcap;
@@ -10,70 +14,73 @@ PacketConsumerThread::PacketConsumerThread(shared_ptr<PacketPool>  pool, QObject
 	this->pool = pool;	
 }
 
-void PacketConsumerThread::setDbtype(string dbtype) {
-	this->dbtype = dbtype;
-}
-
-void PacketConsumerThread::setHost(string host) {
-	this->host = host;
-}
-
-void PacketConsumerThread::setPassword(string password) {
-	this->password = password;
-}
-
-
-void PacketConsumerThread::setUser(string user) {
-	this->user = user;
-}
-
-void PacketConsumerThread::setDbname(string dbname) {
-	this->dbname = dbname;
-}
-
-void PacketConsumerThread::stop() {
-	this->stopping = true;
-}
-
 void PacketConsumerThread::run() {
-	shared_ptr<IPacketDetailDAO> dao = PacketDetailDAOFactory::getPacketDetailDAO(dbtype);
-	dao->open(host, user, password, dbname);
+	shared_ptr<IPacketDAO> dao = PacketDAOFactory::getPacketDAO();
+	dao->open();
 
 	while (!stopping) {
-		shared_ptr<const Packet> packet = pool->take();
-		
-		PacketDetail detail;
-		if (shared_ptr<const IPPacket> inetpkt = dynamic_pointer_cast<const IPPacket>(packet)) {
-			detail.caplen = inetpkt->getLength();
-			detail.len = inetpkt->raw_data_length();
-			detail.src_ip = inetpkt->getSourceIP().c_str();
-			detail.dst_ip = inetpkt->getDestinationIP().c_str();
+		shared_ptr<Packet> packet = pool->take();
 
-			long long sec = inetpkt->getTimestamp().tv_sec;
-			long long usec = inetpkt->getTimestamp().tv_usec;
-			long long msecs = sec * 1000 + usec / 1000;
-			detail.timestamp = QDateTime::fromMSecsSinceEpoch(msecs);
-
-			for (int i = 0; i < inetpkt->raw_data_length(); i++) {
-				detail.data[i] = inetpkt->raw_data_begin()[i];
-			}
-
-			if (shared_ptr<const TCPPacket> tcppkt = dynamic_pointer_cast<const TCPPacket>(packet)) {
-				detail.transport_protocol = "tcp";
-				detail.src_port = tcppkt->getSourcePort();
-				detail.dst_port = tcppkt->getDestinationPort();
-			} else if (shared_ptr<const UDPPacket> udppkt = dynamic_pointer_cast<const UDPPacket>(packet)) {
-				detail.transport_protocol = "udp";
-				detail.src_port = udppkt->getSourcePort();
-				detail.dst_port = udppkt->getDestinationPort();
-			} else {
-			}
+		// 应用层过滤器
+		shared_ptr<Filter> filters = createChain();	
+		shared_ptr<PacketDTO> dto = filters->intercept(packet);	
+		if (dto) {
+			dao->insert(dto);
 		}
-		dao->insert(detail);
 
-		count++;		
-		emit valueChanged(count);
+		// 生成统计数据
+		changeStats(dto);
+	}
+	dao->close();
+}
+
+shared_ptr<Filter> PacketConsumerThread::createChain() {
+	QSettings config("config/task.ini", QSettings::IniFormat);
+	config.setIniCodec("UTF-8");
+	
+	shared_ptr<Filter> head;
+
+	if (config.contains("task/id")) { // 认为配置了任务
+		shared_ptr<Filter> p(new TaskFilter());
+		head = p;
+		shared_ptr<Filter> tail = p;
+
+		p = shared_ptr<Filter>(new NullFilter());
+		tail->setNext(p);
+		tail = p;
+	} else {	// 没有配置任务
+		shared_ptr<Filter> p(new TrivialFilter());
+		head = p;
+		shared_ptr<Filter> tail = p;
+
+		p = shared_ptr<Filter>(new NullFilter());
+		tail->setNext(p);
+		tail = p;
 	}
 
-	dao->close();
+	return head;
+}
+
+void PacketConsumerThread::changeStats(shared_ptr<PacketDTO> dto) {
+	// 当前总量和过滤后的实际量
+	stats["global/current"]++;
+	if (dto) {
+		stats["global/saved"]++;
+
+		// 按传输层协议
+		QString transport_protocol = dto->transport_protocol;
+		if (transport_protocol != "") {
+			stats["protocol/" + transport_protocol]++;
+		}
+
+		// 按信息分类
+		QString category = dto->category_name;
+		if (category != "") {
+			stats["category/" + category]++;
+		}
+	}
+}
+
+QMap<QString, int> PacketConsumerThread::getStats() {
+	return stats;
 }

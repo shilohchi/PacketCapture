@@ -15,6 +15,10 @@ EthernetInfo::~EthernetInfo() {
 	delete[] header;
 }
 
+Protocol EthernetInfo::getType() {
+	return Protocol::Ethernet;
+}
+
 Protocol EthernetInfo::getProtocol() {
 	Protocol protocol;
 

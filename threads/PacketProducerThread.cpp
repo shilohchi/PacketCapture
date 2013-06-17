@@ -1,4 +1,5 @@
 #include "PacketProducerThread.h"
+#include <QSettings>
 
 using namespace std;
 using namespace cxxpcap;
@@ -6,29 +7,30 @@ using namespace cxxpcap;
 PacketProducerThread::PacketProducerThread(shared_ptr<PacketPool> pool, QObject* parent) :
 		QThread(parent) {
 	this->pool = pool;
-	this->writer.setPool(pool);
-}
-
-void PacketProducerThread::setFilter(string filter) {
-	this->filter = filter;
-}
-
-void PacketProducerThread::setInterface(string netinterface) {
-	this->netinterface = netinterface;
+	this->writer->setPool(pool);
 }
 
 void PacketProducerThread::run() {
-	capture.open(netinterface);
-	capture.setFilter(filter);
-	capture.addHandler(&this->counter);
-	capture.addHandler(&this->writer);
-	capture.start();
-}
+	QSettings config("config/config.ini", QSettings::IniFormat);
+	config.setIniCodec("UTF-8");
+	
+	string device = config.value("capture/device").toString().toStdString();
+	capture.open(device);
 
-TrafficCounter& PacketProducerThread::getCounter() {
-	return this->counter;
+	string filter = config.value("capture/rule").toString().toStdString();
+	capture.setFilter(filter);
+
+	capture.addHandler(this->stats);
+	capture.addHandler(this->writer);
+
+	capture.start();
 }
 
 void PacketProducerThread::stop() {
 	capture.stop();
 }
+
+int PacketProducerThread::getStats() {
+	return stats->getTotal();
+}
+

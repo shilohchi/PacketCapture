@@ -3,20 +3,32 @@
 
 #include <stdexcept>
 
-using namespace std;
-
-class ConfigError : public logic_error {
+class SqlError : public std::runtime_error {
 public:
-	ConfigError(const char* msg);
+	SqlError(const char* msg) :
+			std::runtime_error(msg) {
+	};
 };
 
-class SqlError : public runtime_error {
+class UnsupportedDatabaseError : public std::logic_error {
 public:
-	SqlError(const char* msg);
+	UnsupportedDatabaseError(const char* msg) :
+			std::logic_error(msg) {
+	};
 };
 
-class UnsupportedDatabaseError : public logic_error {
+class UnsupportedOperationError : public std::logic_error {
 public:
-	UnsupportedDatabaseError(const char* msg);
+	UnsupportedOperationError(const char* msg) :
+			std::logic_error(msg) {
+	}
 };
+
+class ValidationError : public std::logic_error {
+public:
+	ValidationError(const char* msg) :
+			std::logic_error(msg) {
+	}
+};
+
 #endif

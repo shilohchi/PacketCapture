@@ -6,17 +6,15 @@
 namespace cxxpcap {
 class TCPPacket : public IPPacket {
 protected:
-	std::uint8_t* tcp_header;
-	std::uint8_t* tcp_data;
+	unsigned char* tcp_header;
+	unsigned char* tcp_data;
 	
 public:
-	typedef const std::uint8_t* const_iterator;
+	typedef const unsigned char* const_iterator;
 	
-	static bool isValid(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
+	static bool isValid(std::shared_ptr<IPPacket> packet);
 
-	TCPPacket(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
-	TCPPacket(int length, timeval timestamp, const std::uint8_t* raw_data,
-			int raw_data_length, Protocol datalink_protocol);
+	TCPPacket(std::shared_ptr<IPPacket> packet);
 
 	TCPPacket(const TCPPacket&) = delete;
 

@@ -19,5 +19,9 @@ create table packets_details (
 	
 	application_protocol varchar(20),
 	
-	task_name varchar(50)
+	task_id char(2),
+	task_name varchar(50),
+
+	category_id char(2),
+	category_name varchar(50)
 );

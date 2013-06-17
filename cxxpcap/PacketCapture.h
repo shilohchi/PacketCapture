@@ -1,18 +1,17 @@
 #ifndef PACKET_CAPTURE_H_
 #define PACKET_CAPTURE_H_
-#include "cxxpcap/utils.h"
+#include "cxxpcap/cxxpcap_utils.h"
 #include <pcap.h>
 #include <string>
 #include <vector>
 #include <memory>
-#include <functional>
 #include "cxxpcap/Packet.h"
 
 namespace cxxpcap {
 
 class PacketReciever {
 public:
-	virtual void recievePacket(std::shared_ptr<const Packet> packet) = 0;
+	virtual void recievePacket(std::shared_ptr<Packet> packet) = 0;
 };
 
 class PacketCapture {
@@ -29,9 +28,7 @@ private:
 	
 	pcap_t* capture = NULL;
 
-	std::vector<std::function<void(std::shared_ptr<const Packet>)>> handlers;
-	
-	std::vector<PacketReciever*> recievers;
+	std::vector<std::shared_ptr<PacketReciever>> recievers;
 
 public:
 	static std::shared_ptr<std::vector<NetworkInterface> > findAllDevices();
@@ -46,11 +43,9 @@ public:
 	
 	void setFilter(std::string filter);
 	
-	void addHandler(std::function<void(std::shared_ptr<const Packet>)> handler);
+	void addHandler(std::shared_ptr<PacketReciever> reciever);
 
-	void addHandler(PacketReciever* reciever);
-
-	void fireEvent(std::shared_ptr<const Packet> packet);
+	void fireEvent(std::shared_ptr<Packet> packet);
 
 	void removeAllHandlers();
 

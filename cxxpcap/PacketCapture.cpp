@@ -2,7 +2,7 @@
 #include <pcap.h>
 #include <vector>
 #include <string>
-#include "cxxpcap/utils.h"
+#include "cxxpcap/cxxpcap_utils.h"
 #include "cxxpcap/PacketFactory.h"
 
 using namespace std;
@@ -12,8 +12,7 @@ namespace cxxpcap {
 
 char PacketCapture::errbuf[PCAP_ERRBUF_SIZE];
 
-PacketCapture::PacketCapture() :
-		handlers() {
+PacketCapture::PacketCapture() {
 	capture = NULL;
 }
 
@@ -66,21 +65,11 @@ void PacketCapture::close() {
 	this->capture = NULL;
 }
 
-void PacketCapture::addHandler(function<void(shared_ptr<const Packet>)> handler) {
-	handlers.push_back(handler);
-}
-
-void PacketCapture::addHandler(PacketReciever* reciever) {
+void PacketCapture::addHandler(shared_ptr<PacketReciever> reciever) {
 	recievers.push_back(reciever);
 }
 
-void PacketCapture::fireEvent(shared_ptr<const Packet> packet) {
-	if (!handlers.empty()) {
-		for (auto handle : handlers) {
-			handle(packet);
-		}
-	}
-	
+void PacketCapture::fireEvent(shared_ptr<Packet> packet) {
 	if (!recievers.empty()) {
 		for (auto reciever: recievers) {
 			reciever->recievePacket(packet);
@@ -89,7 +78,6 @@ void PacketCapture::fireEvent(shared_ptr<const Packet> packet) {
 }
 
 void PacketCapture::removeAllHandlers() {
-	handlers.clear();
 	recievers.clear();
 }
 
@@ -110,7 +98,7 @@ Protocol PacketCapture::getDatalinkType() {
 void PacketCapture::start(int count) {
 	auto callback = [] (uint8_t* params, const struct pcap_pkthdr* header, const uint8_t* raw_data) {
 		PacketCapture* pktcap = (PacketCapture*) params;
-		shared_ptr<const Packet> packet = PacketFactory::createPacket(header->len, header->ts,
+		shared_ptr<Packet> packet = PacketFactory::createPacket(header->len, header->ts,
 				raw_data, header->caplen, pktcap->getDatalinkType());
 		pktcap->fireEvent(packet);	
 	};

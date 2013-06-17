@@ -8,6 +8,6 @@ PoolWriter::PoolWriter(std::shared_ptr<PacketPool> pool) {
 	this->pool = pool;
 }
 
-void PoolWriter::recievePacket(std::shared_ptr<const cxxpcap::Packet> packet) {
+void PoolWriter::recievePacket(std::shared_ptr<cxxpcap::Packet> packet) {
 	this->pool->put(packet);
 }

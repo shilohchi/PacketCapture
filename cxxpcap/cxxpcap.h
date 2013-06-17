@@ -2,7 +2,7 @@
 #define CXXPCAP_H_
 
 #include <cxxpcap/PacketCapture.h>
-#include <cxxpcap/utils.h>
+#include <cxxpcap/cxxpcap_utils.h>
 #include <cxxpcap/PacketFactory.h>
 #include <cxxpcap/IPPacket.h>
 #include <cxxpcap/TCPPacket.h>

@@ -1,24 +1,25 @@
 #include "cxxpcap/UDPPacket.h"
+#include "assert_ex.h"
+
+using namespace std;
 
 namespace cxxpcap {
-bool UDPPacket::isValid(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) {
-	if (!IPPacket::isValid(raw_data, raw_data_length, datalink_protocol)) {
-		return false;
+bool UDPPacket::isValid(shared_ptr<IPPacket> packet) {
+	bool valid = true;
+	try {
+		assert_ex(packet->getIPProtocol() == Protocol::UDP, ValidationError(""));
+		assert_ex(packet->raw_data_end() >= packet->ip_data_begin() + 8, ValidationError(""));
+	} catch (ValidationError& e) {
+		valid = false;
 	}
-	IPPacket pkt(raw_data, raw_data_length, datalink_protocol);
-	if (pkt.getIPProtocol() != Protocol::UDP || pkt.raw_data_end() < pkt.ip_data_begin() + 8) {
-		return false;
-	}
-	return true;
+	return valid;
 }
 
-UDPPacket::UDPPacket(const uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol) :
-		UDPPacket(raw_data_length, {0, }, raw_data, raw_data_length, datalink_protocol) {
-}
-
-UDPPacket::UDPPacket(int length, timeval timestamp, const uint8_t* raw_data,
-		int raw_data_length, Protocol datalink_protocol) :
-		IPPacket(length, timestamp, raw_data, raw_data_length, datalink_protocol) {
+UDPPacket::UDPPacket(shared_ptr<IPPacket> packet) :
+		IPPacket(packet) {
+	if (!isValid(packet)) {
+		throw PacketError("udp");
+	}
 	this->udp_header = this->ip_data;
 	this->udp_data = this->ip_data + getUDPHeaderLength();
 }

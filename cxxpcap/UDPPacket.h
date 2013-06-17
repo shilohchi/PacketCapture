@@ -1,8 +1,8 @@
-#ifndef UDPPACKET_H_
-#define UDPPACKET_H_
+#ifndef UDP_PACKET_H_
+#define UDP_PACKET_H_
 
 #include "cxxpcap/IPPacket.h"
-#include "cxxpcap/utils.h"
+#include "cxxpcap/cxxpcap_utils.h"
 
 namespace cxxpcap {
 class UDPPacket : public IPPacket {
@@ -11,17 +11,15 @@ private:
 	int destinationPort;
 
 protected:
-	std::uint8_t* udp_header;
-	std::uint8_t* udp_data;
+	unsigned char* udp_header;
+	unsigned char* udp_data;
 
 public:
-	typedef std::uint8_t* const_iterator;
+	typedef unsigned char* const_iterator;
 
-	static bool isValid(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
+	static bool isValid(std::shared_ptr<IPPacket> packet);
 
-	UDPPacket(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
-	UDPPacket(int length, timeval timestamp, const std::uint8_t* raw_data, int raw_data_length,
-			Protocol datalink_protocol);
+	UDPPacket(std::shared_ptr<IPPacket> packet);
 
 	UDPPacket(const UDPPacket&) = delete;
 

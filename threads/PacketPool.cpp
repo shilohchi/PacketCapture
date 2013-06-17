@@ -18,10 +18,10 @@ PacketPool::PacketPool(int size) {
 	}
 	this->emptySlotSem = shared_ptr<QSemaphore>(new QSemaphore(size));
 	this->size = size;
-	this->buffer = new shared_ptr<const Packet>[size];
+	this->buffer = new shared_ptr<Packet>[size];
 }
 
-void PacketPool::put(shared_ptr<const Packet> packet) {
+void PacketPool::put(shared_ptr<Packet> packet) {
 	emptySlotSem->acquire();
 	QMutexLocker(&this->mutex);
 	buffer[head] = packet;
@@ -29,10 +29,10 @@ void PacketPool::put(shared_ptr<const Packet> packet) {
 	fullSlotSem->release();
 }
 
-shared_ptr<const Packet> PacketPool::take() {
+shared_ptr<Packet> PacketPool::take() {
 	fullSlotSem->acquire();
 	QMutexLocker(&this->mutex);
-	shared_ptr<const Packet> packet = buffer[tail];
+	shared_ptr<Packet> packet = buffer[tail];
 	tail = (tail + 1) % size;
 	emptySlotSem->release();
 	return packet;

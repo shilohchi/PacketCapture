@@ -1,9 +1,9 @@
-#ifndef IPPACKET_H_
-#define IPPACKET_H_
+#ifndef IP_PACKET_H_
+#define IP_PACKET_H_
 
 #include "cxxpcap/InetPacket.h"
 #include <string>
-#include "cxxpcap/utils.h"
+#include "cxxpcap/cxxpcap_utils.h"
 
 namespace cxxpcap {
 class IPPacket : public InetPacket {
@@ -18,11 +18,9 @@ protected:
 public:
 	typedef const uint8_t* const_iterator;
 	
-	static bool isValid(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
+	static bool isValid(std::shared_ptr<InetPacket> packet);
 
-	IPPacket(const std::uint8_t* raw_data, int raw_data_length, Protocol datalink_protocol);
-	IPPacket(int length, timeval timestamp, const std::uint8_t* raw_data,
-			int raw_data_length, Protocol datalink_protocol);
+	IPPacket(std::shared_ptr<InetPacket> packet);
 
 	IPPacket(const IPPacket&) = delete;
 

@@ -13,7 +13,7 @@ private:
 
 	int size;
 
-	std::shared_ptr<const cxxpcap::Packet>*  buffer;
+	std::shared_ptr<cxxpcap::Packet>*  buffer;
 
 	std::shared_ptr<QSemaphore> fullSlotSem{new QSemaphore(0)};
 
@@ -28,9 +28,9 @@ public:
 
 	virtual ~PacketPool();
 	
-	void put(std::shared_ptr<const cxxpcap::Packet> packet);
+	void put(std::shared_ptr<cxxpcap::Packet> packet);
 
-	std::shared_ptr<const cxxpcap::Packet> take();
+	std::shared_ptr<cxxpcap::Packet> take();
 };
 
 #endif
